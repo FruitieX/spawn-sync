@@ -54,12 +54,16 @@ function invoke(cmd) {
 module.exports = spawn;
 function spawn(cmd, args, options) {
   options = options || {};
-  var stdout = path.normalize(__dirname + '/temp/stdout');
-  var stderr = path.normalize(__dirname + '/temp/stderr');
+  var stdout = options.stdio[1];
+  var stderr = options.stdio[2];
   if (args && args.length) {
     cmd += ' ' + args.join(' ')
   }
-  cmd = cmd + ' > ' + stdout + ' 2> ' + stderr;
+  if(stdout)
+    cmd = cmd + ' > ' + stdout
+  if(stderr)
+    cmd = cmd + ' 2> ' + stderr;
+
   if (options.input) {
     fs.writeFileSync(input, options.input, {encoding: options.encoding});
     cmd = 'node ' + read + ' | ' + cmd
@@ -67,13 +71,9 @@ function spawn(cmd, args, options) {
   var exitCode = invoke(cmd);
   var res = {
     exitCode: exitCode,
-    stdout: fs.readFileSync(stdout),
-    stderr: fs.readFileSync(stderr)
   };
   if (options.input) {
     fs.unlinkSync(input);
   }
-  fs.unlinkSync(stdout);
-  fs.unlinkSync(stderr);
   return res;
 }
