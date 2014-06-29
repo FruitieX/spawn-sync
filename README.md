@@ -18,9 +18,11 @@ On platforms that support compiling native modules it uses the [execSync]() modu
 ```js
 var spawnSync = require('child_process').spawnSync || require('spawn-sync');
 
-var result = spawnSync('node',
-                       ['filename.js'],
-                       {input: 'write this to stdin'});
+var result = spawnSync('node', ['filename.js'], {
+    input: 'write this to stdin',
+    // don't redirect stdin, don't redirect stdout, redirect stderr to /dev/null
+    stdio: [ false, false, '/dev/null' ]
+});
 
 // Note, status code will always equal 0 if using busy waiting fallback
 if (result.statusCode !== 0) {
